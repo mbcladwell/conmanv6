@@ -1,0 +1,83 @@
+-*- mode: org; coding: utf-8; -*-
+
+#+TITLE: README for Conmanv4
+This project will use guile-hall for packaging
+direct copy of conmanv3
+9/2021:
+get rid of duplicate emails
+
+
+Must:
+sudo apt-get install libio-socket-ssl-perl libdigest-hmac-perl libterm-readkey-perl libmime-lite-perl libfile-libmagic-perl libio-socket-inet6-perl
+
+
+
+Note conmanv4/conmanv4/conman.go is th executable
+conmanv4/conmanv4.scm is the package recipe
+
+/projects$ hall init --author "mbcladwell" conmanv4 --execute
+cd conmanv4
+hall scan -x
+hall dist -x 
+guix environment -l guix.scm
+autoreconf -vif && ./configure && make && exit
+make dist
+
+
+Header for conmanv4.scm:
+#! /gnu/store/kphp5d85rrb3q1rdc2lfqc1mdklwh3qp-guile-3.0.9/bin/guile \
+-e main -s
+!#
+
+(add-to-load-path "/home/mbc/projects/conmanv4")
+(add-to-load-path "/gnu/store/ldba6gkvw4bjyp6qzbrij1w9nhcvjhl7-guile-gnutls-3.7.9/share/guile/site/3.0")
+
+(use-modules (conmanv4 env)  
+	     (conmanv4 utilities)
+	     (conmanv4 cemail)
+	     (conmanv4 recs)
+	     (conmanv4 munger)
+	     (conmanv4 pubmed)
+	     (srfi srfi-19)   ;; date time
+	     (srfi srfi-1)  ;;list searching; delete-duplicates in list 
+	   ;  (ice-9 rdelim)
+	   ;  (ice-9 i18n)   ;; internationalization
+	   ;  (ice-9 popen)
+	  ;   (ice-9 regex) ;;list-matches
+	     (ice-9 pretty-print)
+      	     )
+      	     
+      	     
+Notes
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; guix environment --network --expose=/etc/ssl/certs/  --manifest=manifest.scm
+;; guile -e main -s ./conman.scm 7 10
+;; 7 days (&reldate)
+;; max 10 summaries (&retmax)
+
+;;guix environment --pure --network --expose=/etc/ssl/certs/  --manifest=manifest.scm -- ./conman.scm 7 2
+
+;; https://pubmed.ncbi.nlm.nih.gov/"
+;; scp ~/projects/conman/conman.scm mbc@192.168.1.11:/home/mbc/projects/conman/conman.scm
+
+
+;; When setting up crontab use full path to executables
+;; 45 6 * * * /gnu/store/m5iprcg6pb5ch86r9agmqwd8v6kp7999-guile-3.0.5/bin/guile -L /gnu/store/l01lprwdfn8bf1ql0sdpk40cai26la6n-conmanv4-0.1/share/guile/site/3.0 -e main -s /gnu/store/l01lprwdfn8bf1ql0sdpk40cai26la6n-conmanv4-0.1/share/guile/site/3.0/conmanv4.scm 1 30
+
+;; (main '( "" "1" "30"))
+
+;; cd /home/mbc/projects/conmanv3 &&  guix environment --manifest=manifest.scm -- guile -L /home/mbc/projects -e main -s ./conman.scm 1 30
+
+
+stored procedure new_customer
+
+BEGIN
+DECLARE last_customer_id INT DEFAULT 0;
+INSERT INTO customer (first_name, last_name, institution, email, product) VALUES(_fname, _lname, _institution, _email, _product);
+SET last_customer_id = LAST_INSERT_ID();
+UPDATE  payment SET customer_id =last_customer_id, expect=_coin_req  WHERE transaction_id IS NULL AND customer_id IS NULL and currency LIKE _currency LIMIT 1;
+SELECT wallet_id INTO @returned_wallet_id FROM payment WHERE customer_id = last_customer_id;
+SELECT @returned_wallet_id;
+
+END
