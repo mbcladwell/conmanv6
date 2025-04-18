@@ -9,8 +9,6 @@ direct copy of conmanv5 with supplementation from conmanv2
 Must:
 sudo apt-get install libio-socket-ssl-perl libdigest-hmac-perl libterm-readkey-perl libmime-lite-perl libfile-libmagic-perl libio-socket-inet6-perl
 
-
-
 Note conmanv6/conmanv6/conman.go is th executable
 conmanv6/conmanv6.scm is the package recipe
       	     
@@ -19,16 +17,30 @@ conmanv6/conmanv6.scm is the package recipe
 ;; scp ~/projects/conman/conman.scm mbc@192.168.1.11:/home/mbc/projects/conman/conman.scm
 
 
+Sequence of calls
+
+main  (get-summaries "15" "10")
+                 get chunk of text with relevant data
+		 (get-pmid-jrn-title d)) ;;makes the ref-records as a side effect; updates ref table in db  -- in pubmed.scm
+		            (make-ref-sql b f d "INSERT INTO ref (pmid, journal, title) VALUES "))
+			               b f d are lists; generates single insert for all refs w/pmid
+			    (make-ref-records b f d ) ;;when not using db  -- in rec.scm
+			    (update-ref-table sql)  ;;updates the ref table in the MySQL db       -- sqlstuff.scm
+      (map map-over-summaries a))  ;;this does all the work; comment out last line for testing    -- test.scm
+                 (retrieve-article a-summary)                                                      -- pubmed.scm
+		                 (get-authors-records the-body)                                    -- munger.scm
+
+				 author-records4 looks like:
+				 (#<<contact> pmid: "40085975" index: 1 qname: "Wei L" wholen: "Lin Wei" firstn: "Lin" lastn: "Wei"
+				 affil: "State Key Laboratory of Biocatalysis and Enzyme Engineering, School of Life Sciences, Hubei University, Wuhan, Hubei, PR China; Hubei Jiangxia Laboratory, Wuhan, Hubei, PR China."
+				 email: "null">
+                                 #<<contact> pmid: "40085975" index: 17 qname: "Wei Z" wholen: "Zigong Wei" firstn: "Zigong" lastn: "Wei"
+				 affil: "State Key Laboratory of Biocatalysis and Enzyme Engineering, School of Life Sciences, Hubei University, Wuhan, Hubei, PR China; Hubei Jiangxia Laboratory, Wuhan, Hubei, PR China; Hubei Province Key Laboratory of Biotechnology of Chinese Traditional Medicine, National &amp; Local Joint Engineering Research Center of High-throughput Drug Screening Technology, School of life sciences, Hubei University, Wuhan, Hubei, PR China. "
+				 email: "weizigong@163.com">)
+
+				 (recurse-send-email author-records4)                              -- cemail.scm
+				         (send-email)  extracts information
 
 
-stored procedure new_customer
-
-BEGIN
-DECLARE last_customer_id INT DEFAULT 0;
-INSERT INTO customer (first_name, last_name, institution, email, product) VALUES(_fname, _lname, _institution, _email, _product);
-SET last_customer_id = LAST_INSERT_ID();
-UPDATE  payment SET customer_id =last_customer_id, expect=_coin_req  WHERE transaction_id IS NULL AND customer_id IS NULL and currency LIKE _currency LIMIT 1;
-SELECT wallet_id INTO @returned_wallet_id FROM payment WHERE customer_id = last_customer_id;
-SELECT @returned_wallet_id;
-
-END
+;; for testing
+cemail.scm line 133

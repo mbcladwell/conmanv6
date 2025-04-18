@@ -1,7 +1,7 @@
-(define-module (conmanv5 bespoke)
-  #:use-module (conmanv5 env)
-  #:use-module (conmanv5 utilities)
-  #:use-module (conmanv5 recs)
+(define-module (conmanv6 bespoke)
+  #:use-module (conmanv6 env)
+  #:use-module (conmanv6 utilities)
+  #:use-module (conmanv6 recs)
   #:use-module (ice-9 regex) ;;list-matches
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 pretty-print)
@@ -103,8 +103,8 @@
       (send-rejected-email email)
       (send-custom-email firstn email txt))))
 
-;; guix shell --manifest=/home/mbc/projects/autostall/conmanv5/manifest.scm -- guile -L . -e '(conmanv5 bespoke)' -s conmanv5/bespoke.scm first-name email 'mytext in quotes'
+;; guix shell --manifest=/home/mbc/projects/autostall/conmanv6/manifest.scm -- guile -L . -e '(conmanv6 bespoke)' -s conmanv6/bespoke.scm first-name email 'mytext in quotes'
   
 
-;; from local ~/projects/conmanv5 after modifying env.scm to chang home directory to /home/mbc
-;; guile -L . -e '(conmanv5 bespoke)' -s conmanv5/bespoke.scm Ben bkleinstiver@mgh.harvard.edu 'I saw your post-bac research opportunity solicitation on X. I can help with LIMS and/or assay development. Check out our software - LIMS*Nucleus.'
+;; from local ~/projects/conmanv6 after modifying env.scm to chang home directory to /home/mbc
+;; guile -L . -e '(conmanv6 bespoke)' -s conmanv6/bespoke.scm Ben bkleinstiver@mgh.harvard.edu 'I saw your post-bac research opportunity solicitation on X. I can help with LIMS and/or assay development. Check out our software - LIMS*Nucleus.'

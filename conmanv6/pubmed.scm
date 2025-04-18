@@ -1,4 +1,4 @@
-(define-module (conmanv5 pubmed)
+(define-module (conmanv6 pubmed)
   #:use-module (ice-9 regex) ;;list-matches
  ;; (srfi srfi-19)   ;; date time
  #:use-module (web response)
@@ -7,25 +7,31 @@
  #:use-module (web client)
  #:use-module (ice-9 receive)	     
  #:use-module (gnutls)	     
- #:use-module (conmanv5 recs)	     
- #:use-module (conmanv5 utilities)	     
- #:use-module (conmanv5 munger)
- #:use-module (conmanv5 env)
- #:use-module (conmanv5 cemail)
+ #:use-module (conmanv6 recs)	     
+ #:use-module (conmanv6 utilities)	     
+ #:use-module (conmanv6 munger)
+ #:use-module (conmanv6 env)
+ #:use-module (conmanv6 cemail)
+ #:use-module (conmanv6 sqlstuff)
  #:use-module (ice-9 string-fun)  ;;string-replace-substring
  #:use-module (srfi srfi-1)  ;;list searching; delete-duplicates in list 
  #:use-module  (srfi srfi-19)   ;; date time
  #:use-module (ice-9 pretty-print) 
  #:export (recurse-get-missing-email
-	   retrieve-article
+	   map-over-summaries
 	   get-summaries
 	   get-stats-list
+
+	   find-email
+	   
 	   ))
 
 (define article-count 0)
 (define author-count 0)
 (define author-find-email-count 0)
-(define batch-id (date->string  (current-date) "~Y~m~d~I~M"))
+(define author-search-success 0)
+
+(define batchid (date->string  (current-date) "~Y~m~d~I~M"))
 
 (define (process-vec-pmid lst results)
   ;;results passed in is '()
@@ -86,9 +92,12 @@
 	 (search-term (string-append "<Item Name=\"FullJournalName\" Type=\"String\">[" all-chars  "]+</Item>"))
 	 (e  (map list-matches  (circular-list search-term) x ))
 	 (f (process-vec-journal e '()))  ;;Journals
+	 (sql (make-ref-sql b f d "INSERT INTO ref (pmid, journal, title) VALUES "))
 	 )
-    ;;    (pretty-print f)))
-      (make-ref-records b f d )
+    (begin
+      (make-ref-records b f d ) ;;when not using db
+      (update-ref-table sql)  ;;updates the ref table in the MySQL db
+      )
     ))
 
 
@@ -96,7 +105,7 @@
 (define (get-summaries reldate retmax)
   ;; this is the initializing method
   ;; calls get-id-authors which provides the return value -- the list (("37658855")  ("Jirangkul P"   "Lorsuwannarat N"   "Wanichjaroen N"))
-  ;; calls get-pmid-jrn-title to make ref records as side effect
+  ;; calls get-pmid-jrn-title to make ref records and populate ref table as side effect
   (let*((db "pubmed")
 ;;	(query (string-append "96+multi+well+OR+high-throughput+screening+assay+(" (uri-encode two-weeks-ago) "[epdat])"))
 	(query (string-append "(((96+well+plate)+OR+(high+throughput+screening))+OR+(multi+well+plate+assay))+AND+((\"" (uri-encode two-weeks-ago) "\"[Date+-+Entry]+%3A+\"" (uri-encode two-weeks-ago) "\"[Date+-+Entry]))"))
@@ -107,7 +116,7 @@
 	(the-body   (receive (response-status response-body)
 			(http-request url) response-body))
 	(dummy (sleep 1))
-        (all-ids-pre   (map match:substring  (list-matches "<Id>[0-9]+</Id>" the-body ) ))
+        (all-ids-pre   (map match:substring  (list-matches "<Id>[0-9]+</Id>" the-body ) ));; the list of pmids
 	(e (if (not (null? all-ids-pre))
 	       (let* ((all-ids (map (lambda (x) (string-append (xsubstring x 4 12) ",")) all-ids-pre))
 		      (all-ids-concat (string-concatenate all-ids))
@@ -115,13 +124,14 @@
 		      (summary-url (string-append base "esummary.fcgi?db=" db "&id=" all-ids-concat  ))
 		      ;; (summary-url (string-append base "esummary.fcgi?db=" db "&id=" all-ids-concat "&version=2.0" ))
 		      (all-summaries   (receive (response-status response-body)
-					   (http-request summary-url) response-body))
+					   (http-request summary-url) response-body)) ;;xml of all summaries
 		      (b (find-occurences-in-string "<DocSum>" all-summaries))
 		      (c (map (lambda (x) (substring all-summaries (car x) (cdr x))) b))
-		      (d (recurse-remove-italicization c '()))
+		      (d (recurse-remove-italicization c '()));;a subset of the xml with relevant data; a list of text (" "    " "   " ")
+		      ;;(_ (pretty-print d))
 		      ;; this is where I will insert the ref table processing
 		      ;; this creates ref-records, an a-list of references
-		      (dummy (get-pmid-jrn-title d)) ;;makes the ref-records as a side effect
+		      (dummy (get-pmid-jrn-title d)) ;;makes the ref-records as a side effect; updates ref table in db
 		      ) 
 		 (map get-id-authors d)
 		 )		      
@@ -149,20 +159,51 @@
 	 (author-records (if the-body (get-authors-records the-body) #f))
 	 (affils-alist '())
 	 (affils-alist (if (null? author-records) #f (get-affils-alist the-body )))
-	 (author-records2 (if (null? affils-alist) #f (recurse-update-contact-records 1 pmid indexed-auth-lst author-records affils-alist '())))
+	 (author-records2 (if (null? affils-alist) #f (recurse-update-contact-records 1 batchid pmid indexed-auth-lst author-records affils-alist '())))
+;;	 (_ (pretty-print "author-records2"))	 
 ;;	 (_ (pretty-print author-records2))
-;;	 (author-records2 (if  affils-alist (recurse-update-contact-records 1 pmid indexed-auth-lst author-records affils-alist '()) #f ))
+;;	 (author-records2 (if  affils-alist (recurse-update-contact-records 1 batchid pmid indexed-auth-lst author-records affils-alist '()) #f ))
 	 (author-records3 (if (null? author-records2) #f (recurse-get-missing-email author-records2 '())))
+;;	 (_ (pretty-print "author-records3"))	 
+;;	 (_ (pretty-print author-records3))
 ;;	 (author-records3 (if  author-records2 (recurse-get-missing-email author-records2 '()) #f))
 	 (unique-emails (recurse-get-unique-emails author-records3 '()))
 ;;	  (_ (pretty-print  "unique-emails:"))
 ;;	 (_ (pretty-print  unique-emails))
 	 (author-records4 (get-unique-email-contacts author-records3 unique-emails '()))
+;;	 (_ (pretty-print "author-records4"))	 
+;;	 (_ (pretty-print author-records4))
+
 	 ;;comment next line for testing and pretty print
 	 (dummy4 (if (null? author-records4) #f (recurse-send-email author-records4) ))
 	 )     
        #f
     ))
+
+
+(define (map-over-summaries a-summary)
+  ;; I must map over the summaries; while mapping, pull down the article
+  ;; on the fly, then combine with a single summary
+  ;; a summary looks like:
+  ;; (("32781280")("Song P" "Xiao Y" "Ren ZJ" "Brooks JP" "Lu L" "Zhou B" "Zhou Y" "Freguia S" "Liu Z" "Zhang N" "Li Y"))
+  ;; note that it is 2 lists
+  ;; to see an article look at retrieve article method
+  ;; Some article don't have affiliations; test for this in retrieve article; if no, the article will be #f
+  (let* (
+	 (the-article (retrieve-article a-summary))
+         ;;not sure what i was doing here as the-article is never returned by retrieve-article
+	 ;;retrieve-article launched for side effects of updating record and db
+	 ;;  (_ (if the-article
+	;; 	(let*( (joined (join-summary-article  a-summary the-article))
+	;; 	       (dummy (set! author-count (+ author-count 1)))
+	;; 	       (_ (pretty-print "This is joined:"))
+	;; 	       (_ (pretty-print joined))
+	;; 	       ;; (dummy2 (map map-over-article joined)) 
+	;; 	       )
+	;; 	  #t )
+	;; 	#f))
+         )
+#t))
 
 
 ;;(pretty-print (retrieve-article "33919699"))
@@ -280,13 +321,15 @@
       (let* (
 	     (email (contact-email the-contact))
 	     (email-null?   (string=? "null" email))
-	     (deplorables '( "Pfizer" "China"))
-	     (affil (contact-affil the-contact))
-	     (ok-affiliation? (not (any-not-false? (map string-contains-ci (circular-list affil) deplorables))))
+	    ;; (deplorables '( "Pfizer" "China"))
+	    ;; (affil (contact-affil the-contact))
+	    ;; (ok-affiliation? (not (any-not-false? (map string-contains-ci (circular-list affil) deplorables))))
 	     (auth-name (contact-qname the-contact))
-	     (new-email (if (and email-null?  ok-affiliation?) (find-email auth-name) email))
+	    ;; (new-email (if (and email-null?  ok-affiliation?) (find-email auth-name) email))
+	     (new-email (if email-null?  (find-email auth-name) email))
 	     (dummy (set! author-count (+ author-count 1)))
 	     (dummy (set-contact-email! the-contact new-email))
+	     (_ (if (string=? "null" email) #f (set! author-search-success (+ author-search-success 1))))
 	     (dummy (set! contacts-out (cons the-contact contacts-out)))
 	     )
 	contacts-out))
@@ -411,7 +454,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define (get-stats-list elapsed-time)
-  (list (cons "batchid" batch-id) (cons "article" (number->string article-count)) (cons "author" (number->string author-count)) (cons "author-find" (number->string author-find-email-count)) (cons "elapsed-time" (number->string elapsed-time))))
+  (list (cons "batchid" batchid) (cons "article" (number->string article-count)) (cons "author" (number->string author-count)) (cons "author-find" (number->string author-find-email-count)) (cons "author-search-success" (number->string author-search-success)) (cons "elapsed-time" (number->string elapsed-time))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; reports end

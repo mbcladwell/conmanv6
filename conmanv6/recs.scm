@@ -1,4 +1,4 @@
-(define-module (conmanv5 recs)
+(define-module (conmanv6 recs)
   #:use-module (ice-9 regex) ;;list-matches
   #:use-module  (srfi srfi-9)  ;;records
   #:use-module (ice-9 pretty-print)
@@ -10,11 +10,13 @@
 	    reference-journal
 	    recurse-update-contact-records
 	    make-contact
+	    contact-batchid
 	    contact-firstn
 	    contact-wholen
 	    contact-pmid
 	    contact-email
 	    contact-affil
+	    contact-lastn
 	    contact-qname
 	    set-contact-email!
 
@@ -48,20 +50,21 @@
 
 
 (define-record-type <contact>
-  (make-contact pmid index qname wholen firstn lastn affil email)
+  (make-contact batchid pmid index qname wholen firstn lastn affil email)
   contact?
-  (pmid    contact-pmid set-contact-pmid!)
+  (batchid contact-batchid set-contact-batchid!)
+  (pmid contact-pmid set-contact-pmid!)
   (index contact-index set-contact-index!)
   (qname contact-qname set-contact-qname!)
   (wholen contact-wholen)
   (firstn contact-firstn)
-  (lastn contact-lastn)
+  (lastn contact-lastn set-contact-lastn!)
   (affil contact-affil set-contact-affil!)
   (email contact-email set-contact-email!))
 
 
 
-(define (update-contact-records counter pmid auth-list the-contact affils auth-out)
+(define (update-contact-records counter batchid pmid auth-list the-contact affils auth-out)
   ;;fill missing fields pmid, index, qname using the passed in, indexed auth-list
       (let* (
 	     (affil-id (contact-affil the-contact)) ;;what I need
@@ -71,6 +74,7 @@
 	     (email (if  affil-list (caddr affil-list) "null"))
 	     (dummy (if  affil (set-contact-affil! the-contact affil) #f))
 	     (dummy (set-contact-email! the-contact email))
+	     (dummy (set-contact-batchid! the-contact batchid))
 	     (dummy (set-contact-pmid! the-contact pmid))
 	     (dummy (set-contact-index! the-contact counter))
 	     (dummy (set-contact-qname! the-contact (cdr (assoc counter auth-list))))
@@ -78,11 +82,11 @@
 	     )
 	 auth-out))
 
-(define (recurse-update-contact-records counter pmid auth-list authors affils auth-out)
-  ;;fill missing fields pmid, index, qname using the passed in, indexed auth-list
+(define (recurse-update-contact-records counter batchid pmid auth-list authors affils auth-out)
+  ;;fill missing fields batchid, pmid, index, qname using the passed in, indexed auth-list
 (if (null? (cdr authors)) 
-    (update-contact-records counter  pmid auth-list (car authors) affils auth-out)     
-    (let* ((a (update-contact-records counter  pmid auth-list (car authors) affils auth-out))
+    (update-contact-records counter batchid pmid auth-list (car authors) affils auth-out)     
+    (let* ((a (update-contact-records counter batchid pmid auth-list (car authors) affils auth-out))
 	   (counter (+ counter 1)))
-      (recurse-update-contact-records counter pmid auth-list (cdr authors) affils a))))
+      (recurse-update-contact-records counter batchid pmid auth-list (cdr authors) affils a))))
 

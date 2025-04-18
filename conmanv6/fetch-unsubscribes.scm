@@ -1,7 +1,7 @@
-(define-module (conmanv5 fetch-unsubscribes)
-  #:use-module (conmanv5 env)
-  #:use-module (conmanv5 utilities)
-  #:use-module (conmanv5 recs)
+(define-module (conmanv6 fetch-unsubscribes)
+  #:use-module (conmanv6 env)
+  #:use-module (conmanv6 utilities)
+  #:use-module (conmanv6 recs)
   #:use-module (ice-9 regex) ;;list-matches
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 pretty-print)
@@ -48,11 +48,11 @@
 	    (backup-unsubscribes)
 	    (make-json-for-unsubscribes all-emails))))))
 
-;; guix shell --manifest=/home/mbc/projects/autostall/conmanv5/manifest.scm -- guile -L . -e '(conmanv5 fetch-unsubscribes)' -s conmanv5/fetch-unsubscribes.scm
+;; guix shell --manifest=/home/mbc/projects/autostall/conmanv6/manifest.scm -- guile -L . -e '(conmanv6 fetch-unsubscribes)' -s conmanv6/fetch-unsubscribes.scm
 
 ;; scp -i labsolns.pem /home/mbc/conman/unsubscribe.json admin@ec2-13-58-241-63.us-east-2.compute.amazonaws.com:./conman/
 
-;;  guile -L /gnu/store/d4c075afxfjjabm5garkml9ldlxqcla5-conmanv5-0.1.a9ee6ef/share/guile/site/3.0/ -e '(conmanv5 fetch-unsubscribes)' -s /gnu/store/d4c075afxfjjabm5garkml9ldlxqcla5-conmanv5-0.1.a9ee6ef/share/guile/site/3.0/conmanv5/fetch-unsubscribes.scm
+;;  guile -L /gnu/store/d4c075afxfjjabm5garkml9ldlxqcla5-conmanv6-0.1.a9ee6ef/share/guile/site/3.0/ -e '(conmanv6 fetch-unsubscribes)' -s /gnu/store/d4c075afxfjjabm5garkml9ldlxqcla5-conmanv6-0.1.a9ee6ef/share/guile/site/3.0/conmanv6/fetch-unsubscribes.scm
 
 
   

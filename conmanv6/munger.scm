@@ -1,9 +1,12 @@
-(define-module (conmanv5 munger)
-  #:use-module (conmanv5 env)
-  #:use-module (conmanv5 recs)
-  #:use-module (conmanv5 utilities)
+(define-module (conmanv6 munger)
+  #:use-module (conmanv6 env)
+  #:use-module (conmanv6 recs)
+  #:use-module (conmanv6 utilities)
+  #:use-module (conmanv6 sqlstuff)
   #:use-module (ice-9 regex) ;;list-matches
  #:use-module (ice-9 receive)	     
+ #:use-module (ice-9 pretty-print) 
+ #:use-module (dbi dbi) 
 
   #:export (generic-email-regexp
 	    get-authors-records
@@ -51,7 +54,7 @@
 	 ;;(a-contact (make-contact "" "" "" full-name  first last affiliation ""))
 	 )
   ;;  (pretty-print affiliation-pre)
-   (make-contact "" "" "" full-name  first last affiliation "")
+   (make-contact "" "" "" "" full-name  first last affiliation "")
     ))
 
 
@@ -141,11 +144,16 @@
 	 		    (affil-v (map match:substring (list-matches affiliations-regexp affil-chunk)))
 			    (lst-affils (map extract-affiliations affil-v ))
 			    ;;here we must recurse and build alist
-			    (affils-alist (recurse-affil-lst lst-affils '()))
-	 		    ;;(lst-affils (map extract-affiliations affil-v ))
+	 		    (lst-affils (map extract-affiliations affil-v ))
+                             
+                            ;; this is db stuff
+			    ;;(affils-alist (recurse-affil-lst lst-affils '()))
+;;			    (db-obj (dbi-open "mysql" "plapan_conman_ad:welcome:plapan_conman:tcp:192.254.187.215:3306"))
+;;			    (affils-alist2 (make-affils-sql affils-alist '() "INSERT INTO affils (affil) VALUES " db-obj))
+;;			    (_ (dbi-close db-obj))
 			    )
-		       ;;lst-affils)
-	 	        affils-alist)
+		       lst-affils)
+	 	       ;; affils-alist2)
 	 	     #f )))
     the-alist)
   )

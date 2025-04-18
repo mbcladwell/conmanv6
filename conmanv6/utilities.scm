@@ -1,4 +1,4 @@
-(define-module (conmanv5 utilities)
+(define-module (conmanv6 utilities)
   #:use-module (ice-9 regex) ;;list-matches
  #:use-module (ice-9 receive)	     
  #:use-module (web response)
@@ -8,7 +8,7 @@
  #:use-module (ice-9 pretty-print)
  #:use-module (srfi srfi-1) 
  #:use-module (srfi srfi-19) ;;date time 
- #:use-module (conmanv5 env) 
+ #:use-module (conmanv6 env) 
   #:export (find-occurences-in-string
 	    any-not-false?
 	    to-regular-char
@@ -19,8 +19,9 @@
 	    ))
 
 (define (get-rand-file-name pre suff)
+  (begin
   (string-append home-dir "/tmp/" pre "-" (substring (string-append (number->string  (time-second (current-time)))(number->string  (time-nanosecond (current-time)))) 0 12) "." suff))
-
+)
 
 (define (first-or-last-auth? auth pmid)
   ;;is the supplied author first or last in the pmid

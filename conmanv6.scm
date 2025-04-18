@@ -1,10 +1,10 @@
-(define-module (conmanv5)
-#:use-module (conmanv5 env)  
-#:use-module (conmanv5 utilities)
-#:use-module (conmanv5 recs)
-#:use-module (conmanv5 munger)
-#:use-module (conmanv5 pubmed)
-#:use-module (conmanv5 cemail)
+(define-module (conmanv6)
+#:use-module (conmanv6 env)  
+#:use-module (conmanv6 utilities)
+#:use-module (conmanv6 recs)
+#:use-module (conmanv6 munger)
+#:use-module (conmanv6 pubmed)
+#:use-module (conmanv6 cemail)
 #:use-module (srfi srfi-19)   ;; date time
 #:use-module (srfi srfi-1)  ;;list searching; delete-duplicates in list 
 #:use-module (ice-9 pretty-print)
@@ -14,17 +14,17 @@
 ;;#! /bin/bash
 
 ;;source /home/admin/.guix-profile/etc/profile
-;;export PATH=/home/admin/conmanv5/bin:${PATH:+:}$PATH
-;;export GUILE_LOAD_PATH=/gnu/store/5yvzilh78996627i8avq532sl2c03i95-gnutls-3.6.15/share/guile/site/3.0:/home/admin/conmanv5:${GUILE_LOAD_PATH:+:}$GUILE_LOAD_PATH
-;;/gnu/store/m5iprcg6pb5ch86r9agmqwd8v6kp7999-guile-3.0.5/bin/guile -e '(conmanv5)' -s /home/admin/conmanv5/conmanv5.scm blah
+;;export PATH=/home/admin/conmanv6/bin:${PATH:+:}$PATH
+;;export GUILE_LOAD_PATH=/gnu/store/5yvzilh78996627i8avq532sl2c03i95-gnutls-3.6.15/share/guile/site/3.0:/home/admin/conmanv6:${GUILE_LOAD_PATH:+:}$GUILE_LOAD_PATH
+;;/gnu/store/m5iprcg6pb5ch86r9agmqwd8v6kp7999-guile-3.0.5/bin/guile -e '(conmanv6)' -s /home/admin/conmanv6/conmanv6.scm blah
 
-;;2025-01-30 use guile -e '(conmanv5)' -L . -s ./conmanv5.scm from project directory
+;;2025-01-30 use guile -e '(conmanv6)' -L . -s ./conmanv6.scm from project directory
 ;; 3 2 * * * /home/admin/.guix-profile/bin/conman.sh --file=/home/admin/.msmtprc >/home/admin/conman.log 2>&1
 
-;; guix shell --manifest=/home/mbc/projects/autostall/conmanv5/manifest.scm -- guile -e '(conmanv5)' -L . -s ./conmanv5.scm
+;; guix shell --manifest=/home/mbc/projects/autostall/conmanv6/manifest.scm -- guile -e '(conmanv6)' -L /home/mbc/projects/conmanv6 -s ./conmanv6.scm
 
-;;on aws from ~/conmanv5 directory
-;; guile -e '(conmanv5)' -L . -s ./conmanv5.scm
+;;on aws from ~/conmanv6 directory
+;; guile -e '(conmanv6)' -L . -L /home/mbc/projects/conmanv6 -s ./conmanv6.scm
 
 (define (main args)
   ;; args: '( "script name" "past days to query" "Number of articles to pull")
@@ -37,6 +37,7 @@
 	 (elapsed-time (ceiling (/ (time-second (time-difference stop-time start-time)) 60)))
 	 (stats-list (get-stats-list elapsed-time))
 	 (dummy7 (send-report stats-list ))
+	 (_ (update-conmanstats stats-list))
 	 )
 ;;   (pretty-print a)
     (pretty-print (string-append "Elapsed time: " (number->string  elapsed-time) " minutes." ))

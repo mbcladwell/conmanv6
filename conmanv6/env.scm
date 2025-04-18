@@ -1,4 +1,4 @@
-(define-module (conmanv5 env)
+(define-module (conmanv6 env)
   #:use-module (ice-9 regex) ;;list-matches
   #:use-module  (srfi srfi-19)   ;; date time
   #:use-module (json)
@@ -22,7 +22,7 @@
 (define sender "mbc2025@labsolns.com")
 (define bcc-recipient "mbc2025@labsolns.com")
 (define personal-email "mbcladwell@labsolns.com")
-(define home-dir "/home/admin/conman")
+(define home-dir "/home/mbc/conman")
 (define unsubscribe-file (string-append home-dir "/unsubscribe.json"))	 
 
 
