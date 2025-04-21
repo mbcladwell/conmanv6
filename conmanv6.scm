@@ -5,6 +5,7 @@
 #:use-module (conmanv6 munger)
 #:use-module (conmanv6 pubmed)
 #:use-module (conmanv6 cemail)
+#:use-module (conmanv6 sqlstuff)
 #:use-module (srfi srfi-19)   ;; date time
 #:use-module (srfi srfi-1)  ;;list searching; delete-duplicates in list 
 #:use-module (ice-9 pretty-print)
