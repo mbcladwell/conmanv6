@@ -21,7 +21,7 @@
 	   map-over-summaries
 	   get-summaries
 	   get-stats-list
-
+	   retrieve-article
 	   find-email
 	   
 	   ))
