@@ -58,3 +58,8 @@
 ;;
 
 ;; /home/ubuntu/conman/bin/conman.sh >/home/ubuntu/conman/conman.log 2>&1
+
+;; DELETE FROM affils;
+;; DELETE FROM conman;
+;; DELETE FROM conmanstats;
+;; DELETE FROM ref;
