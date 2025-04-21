@@ -22,7 +22,7 @@
 (define sender "mbc2025@labsolns.com")
 (define bcc-recipient "mbc2025@labsolns.com")
 (define personal-email "mbcladwell@labsolns.com")
-(define home-dir "/home/mbc/conman")
+(define home-dir "/home/admin/conman")
 (define unsubscribe-file (string-append home-dir "/unsubscribe.json"))	 
 
 
