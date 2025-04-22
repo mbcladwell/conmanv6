@@ -19,7 +19,8 @@
  #:use-module (dbi dbi)
  #:export (
 	   make-ref-sql
-	   update-ref-table
+	   ;;	   update-ref-table
+	   send-sql
 	   map-over-article
 	   make-affils-sql
 	   update-conman
@@ -43,12 +44,12 @@
 	(make-ref-sql (cdr pmid) (cdr journal) (cdr title) sql))))
 
 
-(define (update-ref-table sql)
-  (let* ((db-obj (dbi-open db-vendor connect-string)))
-    (begin 
-      (dbi-query db-obj sql)
-      (dbi-close db-obj)
-      )))
+;; (define (update-ref-table sql)
+;;   (let* ((db-obj (dbi-open db-vendor connect-string)))
+;;     (begin 
+;;       (dbi-query db-obj sql)
+;;       (dbi-close db-obj)
+;;       )))
 
 
 ;; (define (make-affils-sql affils-lst-in affils-lst-out sql db-obj)
@@ -117,11 +118,10 @@
   ;;check if the email is already in the db; if yes, is it marked unsubscribe?
   ;;if yes do not insert, if no insert because this is most likely a new pmid/affiliation
   (let* ((sql-statement (format #f "Call update_conman( '~a', '~a', '~a', '~a', '~a', '~a', '~a', '~a')" batchid pmid qname wholen firstn lastn affil email))
-	 (db-obj (dbi-open db-vendor connect-string))
+	;; (db-obj (dbi-open db-vendor connect-string))
 	 )
-    (begin
-      (dbi-query db-obj sql-statement)
-      (dbi-close db-obj))))
+    (send-sql sql-statement)))
+
 
 (define (update-conmanstats lst)
   (let* ((sql-statement (format #f "INSERT INTO conmanstats (batchid, article, author, author_search, author_find, elapsed) VALUES ( '~a', ~a, ~a, ~a, ~a, ~a)"

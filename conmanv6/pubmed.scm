@@ -96,7 +96,8 @@
 	 )
     (begin
       (make-ref-records b f d ) ;;when not using db
-      (update-ref-table sql)  ;;updates the ref table in the MySQL db
+ ;;     (update-ref-table sql)  ;;updates the ref table in the MySQL db
+      (send-sql sql)  ;;updates the ref table in the MySQL db
       )
     ))
 
