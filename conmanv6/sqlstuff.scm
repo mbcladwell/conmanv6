@@ -108,8 +108,6 @@
   (let* ((sql-statement (format #f "UPDATE conman SET sent=current_timestamp WHERE batchid='~a' AND email='~a'" batchid email))	
 	 )
     (send-sql sql-statement)))
-
-
   
 
 (define (update-conman batchid pmid qname wholen firstn lastn  affil email)
