@@ -122,7 +122,9 @@
 
 
 (define (update-conmanstats lst)
-  (let* ((sql-statement (format #f "INSERT INTO conmanstats (batchid, article, author, author_search, author_find, elapsed) VALUES ( '~a', ~a, ~a, ~a, ~a, ~a)"
+  (let* ((_ (pretty-print (format #f "conmanstats lst: ~a" lst)))
+	 (_ (pretty-print (format #f "batchid: ~a" (assoc "batchid" lst))))
+	 (sql-statement (format #f "INSERT INTO conmanstats (batchid, article, author, author_search, author_find, elapsed) VALUES ( '~a', ~a, ~a, ~a, ~a, ~a)"
 				(cdr (assoc "batchid" lst))
 				(cdr (assoc "article" lst))
 				(cdr (assoc "author" lst))
