@@ -96,8 +96,11 @@
 	 )
     (begin
       (make-ref-records b f d ) ;;when not using db
- ;;     (update-ref-table sql)  ;;updates the ref table in the MySQL db
-      (send-sql sql)  ;;updates the ref table in the MySQL db
+      ;;     (update-ref-table sql)  ;;updates the ref table in the MySQL db
+      	    (pretty-print "before make-ref-sql sql")
+	    (send-sql sql)  ;;updates the ref table in the MySQL db
+     	    (pretty-print "after make-ref-sql sql")
+	    
       )
     ))
 
@@ -132,9 +135,7 @@
 		      ;;(_ (pretty-print d))
 		      ;; this is where I will insert the ref table processing
 		      ;; this creates ref-records, an a-list of references
-		      (_ (pretty-print "before get-pmid-jrn-title"))
 		      (dummy (get-pmid-jrn-title d)) ;;makes the ref-records as a side effect; updates ref table in db
-		      (_ (pretty-print "after get-pmid-jrn-title"))
 		      ) 
 		 (map get-id-authors d)
 		 )		      

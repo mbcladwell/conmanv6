@@ -16,7 +16,9 @@ CREATE TABLE conman
 	email  VARCHAR(250),
         unsubscribe BOOLEAN,
         updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        sent TIMESTAMP);
+        sent TIMESTAMP,
+	registered TIMESTAMP
+	);
 
 DROP TABLE IF EXISTS affils;
 CREATE TABLE affils
