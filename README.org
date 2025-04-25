@@ -26,7 +26,6 @@ main  (get-summaries "15" "10")
 			               b f d are lists; generates single insert for all refs w/pmid
 			    (make-ref-records b f d ) ;;when not using db  -- in rec.scm
 			    (update-ref-table sql)  ;;updates the ref table in the MySQL db       -- sqlstuff.scm
-      (map map-over-summaries a))  ;;this does all the work; comment out last line for testing    -- test.scm
                  (retrieve-article a-summary)                                                      -- pubmed.scm
 		                 (get-authors-records the-body)                                    -- munger.scm
 
