@@ -7,7 +7,6 @@
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 pretty-print)
   #:use-module (srfi srfi-19)   ;; date time
-  #:use-module (dbi dbi)
   #:use-module (json)
   #:export (send-report
 	    send-custom-email
@@ -77,25 +76,12 @@
 	 (title (reference-title (cdr ref)))
 	 (journal (reference-journal (cdr ref)))
 	 (for-report (list (cons "wholen" wholen)(cons "email" email)))
-         ;;need this when using /gnu/store
-;;	 (unsubscribes (get-unsubscribes-from-json))
-	 ;; (sql (format #f "SELECT * FROM unsubscribe WHERE email LIKE '~a';" email))      
-         ;; (ciccio (dbi-open "mysql" "plapan_conman_ad:welcome:plapan_conman:tcp:192.254.187.215:3306"))
-         ;; (_ (dbi-query ciccio sql))      
-;;         (email (if (dbi-get_row ciccio) "null" email));;if email is in unsubscribe list set to null
-;;	 (email (if (member email unsubscribes)
-;;	 (email (if (dbi-get_row ciccio)
-;;		    (begin
-;;		      (set! emails-rejected (cons for-report emails-rejected))
-;;		      "null" )
-;;		    email));;if email is in unsubscribe list set to null
-;;	 (_ (pretty-print (string-append "email test- email: " email " test: " )))
-	 ;;	 (_ (pretty-print unsubscribes))
 	 (_ (update-conman batchid pmid  qname wholen firstn lastn affil email))
 	 (the-list (list (cons "batchid" batchid) (cons "email" email) (cons "journal" journal)(cons "title" title)(cons "firstn" firstn)))
 	 (dummy (if (string= email "null") #f
 		    (begin
 		      (send-custom-email the-list);;comment this out to send report only   <==================uncomment for use
+		      (mark-email-sent batchid email)
 		      (set! emails-sent (cons for-report emails-sent))))))
     #f))
 
@@ -130,9 +116,9 @@
   ;;  ("title" . "Repurposing Drugs for Mayaro Virus: Identification.... Inhibitors.")
   ;;  ("firstn" . "Rana"))
   (let* (
-;;	 (email (assoc-ref item "email"))  ;;<==========================comment this out for testing
+	 (email (assoc-ref item "email"))  ;;<==========================comment this out for testing
 	 (batchid (assoc-ref item "batchid"))
-	 (email "mbcladwell@labsolns.com")
+;;	 (email "mbcladwell@labsolns.com")
 ;;	 (_ (pretty-print (string-append "the email: " email)))
 	 (first-name (if (fname-from-email email) (fname-from-email email)(assoc-ref item "firstn")))
 	 (txt-composite (format #f "Content-Transfer-Encoding: binary\nContent-Type: multipart/alternative; boundary=\"_----------=_1737893771238871\"\nMIME-Version: 1.0\nDate: ~a\nFrom: ~a\nTo: ~a\nBcc: ~a\nSubject: Multi-well plate management software\n\n--_----------=_1737893771238871\nContent-Disposition: inline\nContent-Transfer-Encoding: quoted-printable\nContent-Type: text/plain\n\nDear ~a,\n\nYour recent article entitled ~a in the journal ~a  suggests you might benefit from our product. Visit Laboratory Automation Solutions at www.labsolns.com and learn how LIMS*Nucleus can help you.\n\nLIMS*Nucleus can:\n\n-Reformat plates - four 96 well plates into a 384 well plate; four 384 well plates into a 1536 well plate\n-Associate assay data with plate sets\n-Identify hits scoring in assays using included algorithms - or write your own\n-Export annotated data\n-Generate worklists for liquid handling robots\n-Rearray hits into a smaller collection of plates\n-Track samples\n\nLIMS*Nucleus can serve as the core of a LIMS system.\nPrototype algorithms, dashboards, visualizations with R/Shiny.\nDownload a free copy or evaluate an online running instance by visiting www.labsolns.com/limsn/evaluate/\n\nFor more information contact mbcladwell@labsolns.com\n\nThank You!\n\nMortimer Cladwell MSc\nPrincipal\n\nTo unsubscribe, paste the following URL into a browser:\n\nhttps://www.labsolns.com/limsn/unsubscribe/insert.php?email=~a\n\n--_----------=_1737893771238871\nContent-Transfer-Encoding: binary\nContent-Type: multipart/related; boundary=\"_----------=_1737893771238870\"\n\nThis is a multi-part message in MIME format.\n\n" (date->string (current-date)) sender email bcc-recipient first-name (assoc-ref item "title")(assoc-ref item "journal") email))	
@@ -147,7 +133,9 @@
 	 (msmtp-command (string-append "cat " out-file-name " | msmtp -t" ))
 	 (_ (system msmtp-command))
 	 )
-	 (mark-email-sent batchid email)))
+    #f
+    ;;(mark-email-sent batchid email) ;;moved to send-email
+    ))
 
 (define (send-report lst)
   ;; lst is the stats

@@ -23,10 +23,10 @@
 (define bcc-recipient "mbc2025@labsolns.com")
 (define personal-email "mbcladwell@labsolns.com")
 (define home-dir "/home/admin/conman")
-(define unsubscribe-file (string-append home-dir "/unsubscribe.json"))	 
+;;(define unsubscribe-file (string-append home-dir "/unsubscribe.json"))	 
 
 
-(define days-ago 20) ;; how many days ago to I want to analyze? usually 14      92 + feb date
+(define days-ago 14) ;; how many days ago to I want to analyze? usually 14      92 + feb date
 ;; 14*60*60*24 = 1209600
 ;; 15*60*60*24 =  1296000
 (define duration (time-difference (make-time time-utc  0 (* 86400 days-ago)) (make-time time-utc  0 0)))

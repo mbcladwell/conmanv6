@@ -19,7 +19,7 @@
  #:use-module (dbi dbi)
  #:export (
 	   make-ref-sql
-	   ;;	   update-ref-table
+           update-ref-table
 	   send-sql
 	   map-over-article
 	   make-affils-sql
@@ -44,12 +44,10 @@
 	(make-ref-sql (cdr pmid) (cdr journal) (cdr title) sql))))
 
 
-;; (define (update-ref-table sql)
-;;   (let* ((db-obj (dbi-open db-vendor connect-string)))
-;;     (begin 
-;;       (dbi-query db-obj sql)
-;;       (dbi-close db-obj)
-;;       )))
+(define (update-ref-table pmid jrnl title)
+  (let* ((presql "INSERT INTO ref (pmid, journal, title) VALUES ")
+	 (sql (make-ref-sql pmid jrnl title presql)))
+    (send-sql sql)))
 
 
 ;; (define (make-affils-sql affils-lst-in affils-lst-out sql db-obj)
@@ -116,15 +114,12 @@
   ;;check if the email is already in the db; if yes, is it marked unsubscribe?
   ;;if yes do not insert, if no insert because this is most likely a new pmid/affiliation
   (let* ((sql-statement (format #f "Call update_conman( '~a', '~a', '~a', '~a', '~a', '~a', '~a', '~a')" batchid pmid qname wholen firstn lastn affil email))
-	;; (db-obj (dbi-open db-vendor connect-string))
 	 )
     (send-sql sql-statement)))
 
 
 (define (update-conmanstats lst)
-  (let* ((_ (pretty-print (format #f "conmanstats lst: ~a" lst)))
-	 (_ (pretty-print (format #f "batchid: ~a" (assoc "batchid" lst))))
-	 (sql-statement (format #f "INSERT INTO conmanstats (batchid, article, author, author_search, author_find, elapsed) VALUES ( '~a', ~a, ~a, ~a, ~a, ~a)"
+  (let* ((sql-statement (format #f "INSERT INTO conmanstats (batchid, article, author, author_search, author_find, elapsed) VALUES ( '~a', ~a, ~a, ~a, ~a, ~a)"
 				(cdr (assoc "batchid" lst))
 				(cdr (assoc "article" lst))
 				(cdr (assoc "author" lst))

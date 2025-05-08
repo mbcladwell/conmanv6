@@ -23,6 +23,14 @@
   (string-append home-dir "/tmp/" pre "-" (substring (string-append (number->string  (time-second (current-time)))(number->string  (time-nanosecond (current-time)))) 0 12) "." suff))
 )
 
+(define-syntax comment
+  (lambda (stx)
+    "Ignores all the forms and just returns a @code{#<unspecified>}. It's helpful to prevent the evaluation
+of expressions, while keeping them around."
+    *unspecified*))
+
+;;usage (comment (display 'hi)(+ 1 2) 'hi) => #<unspecified>
+
 (define (first-or-last-auth? auth pmid)
   ;;is the supplied author first or last in the pmid
  (let* ((summary-url (string-append "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id="  pmid))
@@ -38,8 +46,6 @@
 			    (receive (response-status response-body)
 				(http-request summary-url) response-body))
 			  #:unwind? #t))
-
-
 	(dummy (sleep 2))
 	(b (map match:substring  (list-matches "<Item Name=\"Author\" Type=\"String\">[-A-Za-zÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿĀāĂăĄąĆćĈĉĊċČčĎďĐđĒēĔĕĖėĘęĚěĜĝĞğĠġĢģĤĥĦħĨĩĪīĬĭĮįİıĲĳĴĵĶķĸĹĺĻļĽľĿŀŁłŃńŅņŇňŉŊŋŌōŎŏŐőŒœŔŕŖŗŘřŚśŜŝŞşŠšŢţŤťŦŧŨũŪūŬŭŮůŰűŲųŴŵŶŷŸŹźŻżŽžſǍǎǏǐǑǒǓǔǕǖǗǘǙǚǛǜƏƒƠơƯƯǺǻǼǽǾǿńŻć ]+</Item>" the-body )))
 	(c (map (lambda (x) (substring x 34 (- (string-length x) 7))) b))

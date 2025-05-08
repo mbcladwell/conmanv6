@@ -9,6 +9,7 @@
 #:use-module (srfi srfi-19)   ;; date time
 #:use-module (srfi srfi-1)  ;;list searching; delete-duplicates in list 
 #:use-module (ice-9 pretty-print)
+
 #:export (main)
 )
 
@@ -27,12 +28,27 @@
 ;;on aws from ~/conmanv6 directory
 ;; guile -e '(conmanv6)' -L . -L /home/mbc/projects/conmanv6 -s ./conmanv6.scm
 
+
+
+(define (first-four lst results counter)
+  (if (or (null? (cdr lst)) (= counter 3))
+      (begin
+	(set! results (cons (car lst) results))
+	results)
+      (begin
+	(set! results (cons (car lst) results))
+	(set! counter (+ 1 counter))
+	(first-four (cdr lst) results counter))
+  ))
+
+
 (define (main args)
   ;; args: '( "script name" "past days to query" "Number of articles to pull")
   ;; 2023-10-01 revision requires single arg that is not used
   (let* ((start-time (current-time time-monotonic))
 	 ;;	 (a (get-summaries (cadr args) (caddr args)))
 	 (a (get-summaries days-ago max-arts))
+;;	 (a (first-four a '() 0))
 	 (dummy (map retrieve-article a))  ;;this does all the work; comment out last line for testing
 	 (stop-time (current-time time-monotonic))
 	 (elapsed-time (ceiling (/ (time-second (time-difference stop-time start-time)) 60)))

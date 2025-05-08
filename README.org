@@ -29,6 +29,10 @@ main  (get-summaries "15" "10")
                  (retrieve-article a-summary)                                                      -- pubmed.scm
 		                 (get-authors-records the-body)                                    -- munger.scm
 
+				 (recurse-update-contact-records 1 batchid pmid indexed-auth-lst author-records affils-alist '())   --recs.scm
+				 (recurse-get-missing-email author-records2 '())                                                    --pubmed.scm
+				 (recurse-get-unique-emails author-records3 '())                                                    --pubmed.scm
+				 (recurse-send-email author-records4)                                                               --cemail.scm
 				 author-records4 looks like:
 				 (#<<contact> pmid: "40085975" index: 1 qname: "Wei L" wholen: "Lin Wei" firstn: "Lin" lastn: "Wei"
 				 affil: "State Key Laboratory of Biocatalysis and Enzyme Engineering, School of Life Sciences, Hubei University, Wuhan, Hubei, PR China; Hubei Jiangxia Laboratory, Wuhan, Hubei, PR China."
@@ -37,6 +41,7 @@ main  (get-summaries "15" "10")
 				 affil: "State Key Laboratory of Biocatalysis and Enzyme Engineering, School of Life Sciences, Hubei University, Wuhan, Hubei, PR China; Hubei Jiangxia Laboratory, Wuhan, Hubei, PR China; Hubei Province Key Laboratory of Biotechnology of Chinese Traditional Medicine, National &amp; Local Joint Engineering Research Center of High-throughput Drug Screening Technology, School of life sciences, Hubei University, Wuhan, Hubei, PR China. "
 				 email: "weizigong@163.com">)
 
+				 
 				 (recurse-send-email author-records4)                              -- cemail.scm
 				         (send-email)  extracts information
 

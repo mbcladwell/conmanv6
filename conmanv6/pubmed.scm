@@ -92,17 +92,11 @@
 	 (search-term (string-append "<Item Name=\"FullJournalName\" Type=\"String\">[" all-chars  "]+</Item>"))
 	 (e  (map list-matches  (circular-list search-term) x ))
 	 (f (process-vec-journal e '()))  ;;Journals
-	 (sql (make-ref-sql b f d "INSERT INTO ref (pmid, journal, title) VALUES "))
 	 )
     (begin
       (make-ref-records b f d ) ;;when not using db
-      ;;     (update-ref-table sql)  ;;updates the ref table in the MySQL db
-      	    (pretty-print "before make-ref-sql sql")
-	    (send-sql sql)  ;;updates the ref table in the MySQL db
-     	    (pretty-print "after make-ref-sql sql")
-	    
-      )
-    ))
+      (update-ref-table b f d ) ;;updates the ref table in the MySQL db    
+      )))
 
 
 
@@ -119,7 +113,7 @@
 	(url (string-append base  "esearch.fcgi?db=" db "&term=" query "&retmax=" retmax))
 	(the-body   (receive (response-status response-body)
 			(http-request url) response-body))
-	(dummy (sleep 1))
+;;	(dummy (sleep 1))
         (all-ids-pre   (map match:substring  (list-matches "<Id>[0-9]+</Id>" the-body ) ));; the list of pmids
 	(e (if (not (null? all-ids-pre))
 	       (let* ((all-ids (map (lambda (x) (string-append (xsubstring x 4 12) ",")) all-ids-pre))
@@ -157,7 +151,7 @@
 	 (the-body (receive (response-status response-body)
 		       (http-request url) response-body))
 	 (dummy (set! article-count (+ article-count 1)))
-	 (dummy2 (sleep 1))
+;;	 (dummy2 (sleep 1))
 	 ;; must test here for the text </a><sup class=\"equal-contrib-container OR </a><sup class=\"affiliation-links\"><spa
 	 ;; if not present, no affiliations, move on
 	 (author-records (if the-body (get-authors-records the-body) #f))
@@ -252,15 +246,17 @@
   ;;search returns nothing if too many (20) pmids submitted
   ;;work with 10 for now
   ;;used in find-fl-aoi
-  (let* ( (authmod (string-replace-substring auth " " "+"))
+  (let* (;; (_ (pretty-print "position2"))
+	  (authmod (string-replace-substring auth " " "+"))
 	 (url (string-append "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=" (uri-encode authmod) "[auth]&retmax=10"))
 	 (summary-url  (uri-encode url )) 
 	 (the-body   (receive (response-status response-body)
 	 		 (http-request url) response-body))
 	 (dummy (set! author-find-email-count (+ author-find-email-count 1)))
-	 (dummy2 (sleep 1))
+;;	 (dummy2 (sleep 1))
 	 (a (map match:substring  (list-matches "<Id>[0-9]{8}</Id>" the-body )))
 	 (b (map (lambda (x) (substring x 4 (- (string-length x) 5))) a))
+	;;   (_ (pretty-print "position3"))
 	)
     b))
 
@@ -270,8 +266,10 @@
 (define (find-fl-aoi auth)
   ;; find first last author of interest (aoi)
   ;; return a list of pmids where the auth is the first or last author
-  (let* ((a (get-articles-for-auth auth))
-	 ;;next line returns nothing if too many pmids submitted
+  (let* (;; (_ (pretty-print "position1"))
+	  (a (get-articles-for-auth auth))
+	 ;; (_ (pretty-print "position4"))
+	  ;;next line returns nothing if too many pmids submitted
 	 (b   (map first-or-last-auth? (circular-list auth) a))
 	 (holder '())
 	 (dummy (if b (map (lambda (x y) (if x (set! holder (append! holder (list y))) #f)) b a) #f))
@@ -310,7 +308,7 @@
   ;; note that more than 20 pmids may be triggering server to abort
   (let* (
 	 (fl-pmids (find-fl-aoi auth))
-	 (dummy (sleep 1))
+;;	 (dummy (sleep 1))
 	 (email (if fl-pmids (search-fl-for-auth  auth fl-pmids) #f))
 	 )
       (if email email "null")))
@@ -416,7 +414,7 @@
 			    (receive (response-status response-body)
 				(http-request url) response-body))
 			  #:unwind? #t))
-	     (_ (sleep 2))
+;;	     (_ (sleep 2))
 	     (coord-start (string-match "<div class=\"affiliations\">" the-body ))
 	     (coord-end (string-match " <ul class=\"identifiers\" id=\"full-view-identifiers\">" the-body ))
 	     (affil-chunk (if coord-start (xsubstring the-body (match:start coord-start) (match:start coord-end)) #f))

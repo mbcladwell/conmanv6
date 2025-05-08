@@ -2,11 +2,9 @@
   #:use-module (conmanv6 env)
   #:use-module (conmanv6 recs)
   #:use-module (conmanv6 utilities)
-  #:use-module (conmanv6 sqlstuff)
   #:use-module (ice-9 regex) ;;list-matches
  #:use-module (ice-9 receive)	     
  #:use-module (ice-9 pretty-print) 
- #:use-module (dbi dbi) 
 
   #:export (generic-email-regexp
 	    get-authors-records
@@ -91,7 +89,7 @@
 		    (let* (
 			   (coord-end (if (string-match "<div class=\"short-article-details\">" the-body )
 					  (string-match "<div class=\"short-article-details\">" the-body )
-					  (string-match "<div class=\"extended-article-details\" id" the-body )))		       
+					  (string-match "<div class=\"extended-article-details\" id" the-body )))
 			   (auth-chunk (xsubstring the-body (match:start coord-start) (match:start coord-end)))
 			   (auth-chunk (regexp-substitute/global #f "&#39;"  auth-chunk 'pre "" 'post))  ;; get rid of '; O'Hara
 			   (auth-chunk (regexp-substitute/global #f "&amp;"  auth-chunk 'pre "" 'post))  ;; get rid of &
@@ -102,7 +100,10 @@
 					     (string-contains first-author "</a><sup class=\"affiliation-links\"><spa")
 					      (string-contains first-author "</a></span>")
 					      (string-contains first-author "</a><span class=\"comma\">")
-					     )))
+					      ))
+			   
+			   
+			   )
 		      (if proceed-flag (map extract-authors auth-lst) #f))
 		    #f )
 		)
@@ -144,13 +145,7 @@
 	 		    (affil-v (map match:substring (list-matches affiliations-regexp affil-chunk)))
 			    (lst-affils (map extract-affiliations affil-v ))
 			    ;;here we must recurse and build alist
-	 		    (lst-affils (map extract-affiliations affil-v ))
-                             
-                            ;; this is db stuff
-			    ;;(affils-alist (recurse-affil-lst lst-affils '()))
-;;			    (db-obj (dbi-open "mysql" "plapan_conman_ad:welcome:plapan_conman:tcp:192.254.187.215:3306"))
-;;			    (affils-alist2 (make-affils-sql affils-alist '() "INSERT INTO affils (affil) VALUES " db-obj))
-;;			    (_ (dbi-close db-obj))
+	 		    (lst-affils (map extract-affiliations affil-v ))                             
 			    )
 		       lst-affils)
 	 	       ;; affils-alist2)
