@@ -14,7 +14,7 @@ CREATE TABLE conman
 	firstn  VARCHAR(250),
 	lastn  VARCHAR(250),
 	email  VARCHAR(250),
-        unsubscribe BOOLEAN,
+        unsubscribe TIMESTAMP,
         updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         sent TIMESTAMP,
 	registered TIMESTAMP

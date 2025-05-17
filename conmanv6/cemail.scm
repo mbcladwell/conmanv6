@@ -80,7 +80,7 @@
 	 (the-list (list (cons "batchid" batchid) (cons "email" email) (cons "journal" journal)(cons "title" title)(cons "firstn" firstn)))
 	 (dummy (if (string= email "null") #f
 		    (begin
-		      (send-custom-email the-list);;comment this out to send report only   <==================uncomment for use
+;;		      (send-custom-email the-list);;comment this out to send report only   <==================uncomment for use
 		      (mark-email-sent batchid email)
 		      (set! emails-sent (cons for-report emails-sent))))))
     #f))

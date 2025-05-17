@@ -48,3 +48,5 @@ main  (get-summaries "15" "10")
 
 ;; for testing
 cemail.scm line 133
+
+cemail.scm line 83 to send report only
