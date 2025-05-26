@@ -455,8 +455,8 @@
 ;;; reports
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(define (get-stats-list elapsed-time)
-  (list (cons "batchid" batchid) (cons "article" (number->string article-count)) (cons "author" (number->string author-count)) (cons "author-find" (number->string author-find-email-count)) (cons "author-search-success" (number->string author-search-success)) (cons "elapsed-time" (number->string elapsed-time))))
+(define (get-stats-list elapsed-time total-emails-sent)
+  (list (cons "batchid" batchid) (cons "article" (number->string article-count)) (cons "author" (number->string author-count)) (cons "author-find" (number->string author-find-email-count)) (cons "author-search-success" (number->string author-search-success)) (cons "total-emails-sent" (number->string total-emails-sent)) (cons "elapsed-time" (number->string elapsed-time))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; reports end

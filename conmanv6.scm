@@ -29,7 +29,6 @@
 ;; guile -e '(conmanv6)' -L . -L /home/mbc/projects/conmanv6 -s ./conmanv6.scm
 
 
-
 (define (first-four lst results counter)
   (if (or (null? (cdr lst)) (= counter 3))
       (begin
@@ -52,7 +51,7 @@
 	 (dummy (map retrieve-article a))  ;;this does all the work; comment out last line for testing
 	 (stop-time (current-time time-monotonic))
 	 (elapsed-time (ceiling (/ (time-second (time-difference stop-time start-time)) 60)))
-	 (stats-list (get-stats-list elapsed-time))
+	 (stats-list (get-stats-list elapsed-time (get-total-emails-sent)))
 	 (dummy7 (send-report stats-list ))
 	 (_ (update-conmanstats stats-list))
 	 )

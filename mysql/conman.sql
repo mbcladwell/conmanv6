@@ -46,6 +46,7 @@ CREATE TABLE conmanstats
         author INTEGER,
         author_search INTEGER,
         author_find INTEGER,
+        emails_sent INTEGER,
         elapsed INTEGER,
 	updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
 

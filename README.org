@@ -5,6 +5,45 @@ This project will resort pack to using MySQL to hold data
 direct copy of conmanv5 with supplementation from conmanv2
 3/2025
 
+for MySQL version:
+aws t2.micro inadequate
+aws t2.small inadequate
+aws t2.medium works OK
+
+https://docs.aws.amazon.com/systems-manager/latest/userguide/quick-setup-scheduler.html
+https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html
+
+https://us-east-2.console.aws.amazon.com/systems-manager/quick-setup/details/f007d577-9831-406c-a264-e478ad8fee06?region=us-east-2&upgradeVersion=false
+
+https://repost.aws/knowledge-center/execute-user-data-ec2
+
+tag: schedule=true
+to modify user data: actions/instance settings/edit user data
+paste in the following:
+
+Content-Type: multipart/mixed; boundary="//"
+MIME-Version: 1.0
+ 
+--//
+Content-Type: text/cloud-config; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="cloud-config.txt"
+ 
+#cloud-config
+cloud_final_modules:
+- [scripts-user, always]
+--//
+Content-Type: text/x-shellscript; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename="userdata.txt"
+ 
+#! /bin/bash
+/home/admin/bin/conman.sh >/home/admin/conman.log 2>&1
+shutdown -h now
+--//--
 
 Must:
 sudo apt-get install libio-socket-ssl-perl libdigest-hmac-perl libterm-readkey-perl libmime-lite-perl libfile-libmagic-perl libio-socket-inet6-perl

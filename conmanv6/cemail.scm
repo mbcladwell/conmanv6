@@ -14,12 +14,16 @@
 	    emails-sent
 	    emails-rejected
 	    fname-from-email
+	    get-total-emails-sent
 	    main
  	    ))
 
 
 (define emails-sent '())  ;;if an email is sent, cons it to this list
 (define emails-rejected '()) ;;an unsubscribe I am reencountering
+(define total-emails-sent 0) ;;for conmanstats report
+(define (get-total-emails-sent) total-emails-sent)
+
 
 (define unsubscribes #f) ;;from MySQL all unscubscribes
 
@@ -82,6 +86,7 @@
 		    (begin
 ;;		      (send-custom-email the-list);;comment this out to send report only   <==================uncomment for use
 		      (mark-email-sent batchid email)
+		      (set! total-emails-sent (+ total-emails-sent 1))
 		      (set! emails-sent (cons for-report emails-sent))))))
     #f))
 
@@ -147,11 +152,12 @@
 	 (str2 (string-append "Article count: " (cdr (assoc "article" lst)) "\n"))
 	 (str3 (string-append "Author count: " (cdr (assoc "author" lst)) "\n"))
 	 (str4 (string-append "Author find count: " (cdr (assoc "author-find" lst)) "\n"))
-	 (str5 (string-append "Elapsed time: " (cdr (assoc  "elapsed-time" lst)) " minutes.\n\n"))
-	 (str6 (if (null?  emails-sent) "null" (build-sent-list emails-sent "")))
-	 (str7 "\n\n=====unsubscribes=====\n\n")
-	 (str8 (if (null?  emails-rejected) "null" (build-sent-list emails-rejected "")))
-	 (txt-composite (string-append str1 str2 str3 str4 str5 str6 str7 str8))
+	 (str5 (string-append "Total emails sent: " (cdr (assoc "total-emails-sent" lst)) "\n"))	 
+	 (str6 (string-append "Elapsed time: " (cdr (assoc  "elapsed-time" lst)) " minutes.\n\n"))
+	 (str7 (if (null?  emails-sent) "null" (build-sent-list emails-sent "")))
+	 (str8 "\n\n=====unsubscribes=====\n\n")
+	 (str9 (if (null?  emails-rejected) "null" (build-sent-list emails-rejected "")))
+	 (txt-composite (string-append str1 str2 str3 str4 str5 str6 str7 str8 str9))
 	 (txt-file-name (get-rand-file-name "rnd" "txt"))
 	 (p2  (open-output-file txt-file-name))
 	 (dummy (begin
