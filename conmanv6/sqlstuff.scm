@@ -127,7 +127,8 @@
 				(cdr (assoc "author-search-success" lst))
 				(cdr (assoc "total-emails-sent" lst))
 				(cdr (assoc "elapsed-time" lst))
-				)))
+				))
+	 (_ (pretty-print sql-statement)))
     (send-sql sql-statement)))
 
 
