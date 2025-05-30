@@ -58,7 +58,7 @@
       (update-conmanstats stats-list)
       ;;   (pretty-print a)
       (pretty-print (string-append "Elapsed time: " (number->string  elapsed-time) " minutes." ))
-      (system "shutdown -h now")
+      (system "sudo shutdown -h now")
       ;; #f
       )))
    
