@@ -53,12 +53,14 @@
 	 (elapsed-time (ceiling (/ (time-second (time-difference stop-time start-time)) 60)))
 	 (stats-list (get-stats-list elapsed-time (get-total-emails-sent)))
 	 (dummy7 (send-report stats-list ))
-	 (_ (update-conmanstats stats-list))
 	 )
-;;   (pretty-print a)
-    (pretty-print (string-append "Elapsed time: " (number->string  elapsed-time) " minutes." ))
-   ;; #f
-    ))
+    (begin
+      (update-conmanstats stats-list)
+      ;;   (pretty-print a)
+      (pretty-print (string-append "Elapsed time: " (number->string  elapsed-time) " minutes." ))
+      (system "shutdown -h now")
+      ;; #f
+      )))
    
 
 ;;WORKFLOW

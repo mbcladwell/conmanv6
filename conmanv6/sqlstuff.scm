@@ -128,7 +128,8 @@
 				(cdr (assoc "total-emails-sent" lst))
 				(cdr (assoc "elapsed-time" lst))
 				))
-	 (_ (pretty-print sql-statement)))
+	;; (_ (pretty-print sql-statement))
+	 )
     (send-sql sql-statement)))
 
 
