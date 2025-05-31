@@ -89,3 +89,13 @@ main  (get-summaries "15" "10")
 cemail.scm line 133
 
 cemail.scm line 83 to send report only
+
+
+
+;;on May 31 2025 14 days earlier had ~8 authors, 5 min computation time
+
+https://www.timeanddate.com/date/durationresult.html
+
+
+
+;; (_ (system "sudo shutdown -h now"))  works with crontab -e (not sudo crontab -e)
