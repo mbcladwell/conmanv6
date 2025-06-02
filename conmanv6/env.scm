@@ -26,7 +26,7 @@
 ;;(define unsubscribe-file (string-append home-dir "/unsubscribe.json"))	 
 
 
-(define days-ago 14) ;; how many days ago to I want to analyze? usually 14      may 31 2025 value 14 gave ~8 authors
+(define days-ago 16) ;; how many days ago to I want to analyze? usually 14      may 31 2025 value 14 gave ~8 authors
 ;; 14*60*60*24 = 1209600
 ;; 15*60*60*24 =  1296000
 (define duration (time-difference (make-time time-utc  0 (* 86400 days-ago)) (make-time time-utc  0 0)))

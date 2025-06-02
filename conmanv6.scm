@@ -58,7 +58,7 @@
       (update-conmanstats stats-list)
       ;;   (pretty-print a)
       (pretty-print (string-append "Elapsed time: " (number->string  elapsed-time) " minutes." ))
-      (system "sudo shutdown -h now")  ;;works with crontab -e (not sudo)
+      (system "aws-ec2-shutdown.sh")  ;;works with crontab -e (not sudo); must set up asw-cli credentials file 
       ;; #f
       )))
    
