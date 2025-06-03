@@ -8,7 +8,7 @@ direct copy of conmanv5 with supplementation from conmanv2
 for MySQL version:
 aws t2.micro inadequate
 aws t2.small inadequate
-aws t2.medium works OK
+aws t2.medium works OK - no use t2.xlarge
 
 https://docs.aws.amazon.com/systems-manager/latest/userguide/quick-setup-scheduler.html
 https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html
