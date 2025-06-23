@@ -14,6 +14,8 @@
 	    personal-email
 	    home-dir
 	    unsubscribe-file
+	    bcc-email
+	    send-report
 	    ))
 
 ;;(define conman-store-dir "conmanstorepath") ;;this will be modified upon install
@@ -24,6 +26,18 @@
 (define personal-email "mbcladwell@labsolns.com")
 (define home-dir "/home/admin/conman")
 ;;(define unsubscribe-file (string-append home-dir "/unsubscribe.json"))	 
+
+(define bcc-email #t)
+(define send-report #t)
+
+(let*  ((f  (string-append home-dir "/envs.txt"))
+ 	(varlst (call-with-input-file f read))
+	(dummy (pretty-print varlst))
+	)
+  (begin
+    (set! bcc-email (assoc-ref varlst "bcc-email"))
+    (if bcc-email #t (set! bcc-recipient ""))
+    (set! send-report (assoc-ref varlst "send-report"))))
 
 
 (define days-ago 14) ;; how many days ago to I want to analyze? usually 14      may 31 2025 value 14 gave ~8 authors

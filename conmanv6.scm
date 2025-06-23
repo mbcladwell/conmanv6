@@ -52,7 +52,7 @@
 	 (stop-time (current-time time-monotonic))
 	 (elapsed-time (ceiling (/ (time-second (time-difference stop-time start-time)) 60)))
 	 (stats-list (get-stats-list elapsed-time (get-total-emails-sent)))
-	 (dummy7 (send-report stats-list ))
+	 (dummy7 (if send-report (send-report stats-list )))
 	 )
     (begin
       (update-conmanstats stats-list)

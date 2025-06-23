@@ -99,3 +99,4 @@ https://www.timeanddate.com/date/durationresult.html
 
 
 ;; (_ (system "sudo shutdown -h now"))  works with crontab -e (not sudo crontab -e)
+must use aws cli to shutdown and a critical parameter is ith instance id which must be changed if instance is changed
