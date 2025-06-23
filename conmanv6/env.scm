@@ -16,6 +16,7 @@
 	    unsubscribe-file
 	    bcc-email
 	    send-report
+	    get-envs
 	    ))
 
 ;;(define conman-store-dir "conmanstorepath") ;;this will be modified upon install
@@ -30,14 +31,19 @@
 (define bcc-email #t)
 (define send-report #t)
 
-(let*  ((f  (string-append home-dir "/envs.txt"))
- 	(varlst (call-with-input-file f read))
-	(dummy (pretty-print varlst))
+(define (get-envs)
+  ;;returns a list
+  (if (access?  (string-append home-dir "/envs.txt") R_OK)
+      (let* (
+	     (varlst (call-with-input-file f read))
+	     (dummy (pretty-print varlst))
+	     )
+	(begin
+	  (set! bcc-email (assoc-ref varlst "bcc-email"))
+	  (if bcc-email #t (set! bcc-recipient ""))
+	  (set! send-report (assoc-ref varlst "send-report")))
 	)
-  (begin
-    (set! bcc-email (assoc-ref varlst "bcc-email"))
-    (if bcc-email #t (set! bcc-recipient ""))
-    (set! send-report (assoc-ref varlst "send-report"))))
+      #f))
 
 
 (define days-ago 14) ;; how many days ago to I want to analyze? usually 14      may 31 2025 value 14 gave ~8 authors

@@ -45,6 +45,7 @@
   ;; args: '( "script name" "past days to query" "Number of articles to pull")
   ;; 2023-10-01 revision requires single arg that is not used
   (let* ((start-time (current-time time-monotonic))
+	 (_ (get-envs))
 	 ;;	 (a (get-summaries (cadr args) (caddr args)))
 	 (a (get-summaries days-ago max-arts))
 ;;	 (a (first-four a '() 0))
