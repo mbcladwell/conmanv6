@@ -29,19 +29,19 @@
 ;;(define unsubscribe-file (string-append home-dir "/unsubscribe.json"))	 
 
 (define bcc-email #t)
-(define send-report #t)
+(define send-report-flag #t)
+(define envs-file (string-append home-dir "/envs.txt"))
 
 (define (get-envs)
   ;;returns a list
-  (if (access?  (string-append home-dir "/envs.txt") R_OK)
-      (let* (
-	     (varlst (call-with-input-file f read))
-	     (dummy (pretty-print varlst))
+  (if (access? envs-file R_OK)
+      (let* ((varlst (call-with-input-file envs-file read))
+	     ;;(dummy (pretty-print varlst))
 	     )
 	(begin
 	  (set! bcc-email (assoc-ref varlst "bcc-email"))
 	  (if bcc-email #t (set! bcc-recipient ""))
-	  (set! send-report (assoc-ref varlst "send-report")))
+	  (set! send-report-flag (assoc-ref varlst "send-report")))
 	)
       #f))
 
