@@ -15,7 +15,6 @@
 	    home-dir
 	    unsubscribe-file
 	    bcc-email
-	    send-report
 	    get-envs
 	    ))
 
@@ -36,7 +35,6 @@
   ;;returns a list
   (if (access? envs-file R_OK)
       (let* ((varlst (call-with-input-file envs-file read))
-	     ;;(dummy (pretty-print varlst))
 	     )
 	(begin
 	  (set! bcc-email (assoc-ref varlst "bcc-email"))
