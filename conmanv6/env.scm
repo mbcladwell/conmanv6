@@ -15,6 +15,7 @@
 	    home-dir
 	    unsubscribe-file
 	    bcc-email
+	    send-report-flag
 	    get-envs
 	    ))
 
