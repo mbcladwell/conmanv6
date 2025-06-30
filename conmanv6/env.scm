@@ -40,7 +40,7 @@
 	(begin
 	  (set! bcc-email (assoc-ref varlst "bcc-email"))
 	  (if bcc-email #t (set! bcc-recipient ""))
-	  (set! send-report-flag (assoc-ref varlst "send-report")))
+	  (set! send-report-flag (assoc-ref varlst "send-report-flag")))
 	)
       #f))
 
