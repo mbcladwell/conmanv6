@@ -23,9 +23,11 @@
 (define emails-rejected '()) ;;an unsubscribe I am reencountering
 (define total-emails-sent 0) ;;for conmanstats report
 (define (get-total-emails-sent) total-emails-sent)
+;;(define sender "mbc2025@labsolns.com")
+;;(define bcc-recipient "mbc2025@labsolns.com")
 
 
-(define unsubscribes #f) ;;from MySQL all unscubscribes
+;;(define unsubscribes #f) ;;from MySQL all unscubscribes
 
 ;;cannot have this in /gnu/store
 ;; (let* ((p  (open-input-file unsubscribe-file))
@@ -45,15 +47,15 @@
     c))
 
 ;;use the unsubscribes variable from env
-(define (get-unsubscribes-from-json)
-  ;; resource: books tags suffixes (this is also the key in a-list)
-  ;; returns the vector portion converted to list
-  (let* (
-	 (p  (open-input-file unsubscribe-file))
-	 (data (json->scm p))
-	 (vec (assoc-ref data "emails"))
-	 )
-     (vector->list vec)))
+;; (define (get-unsubscribes-from-json)
+;;   ;; resource: books tags suffixes (this is also the key in a-list)
+;;   ;; returns the vector portion converted to list
+;;   (let* (
+;; 	 (p  (open-input-file unsubscribe-file))
+;; 	 (data (json->scm p))
+;; 	 (vec (assoc-ref data "emails"))
+;; 	 )
+;;      (vector->list vec)))
 
 ;;(define a-contact (make-contact "28374827" "3" "qname" "Joe Blow" "Joe" "Blow" "GI" "jblow@acme.org"))
 ;; insert into unsubscribe (email) values ('sunguohui@bjut.edu');
@@ -84,7 +86,7 @@
 	 (the-list (list (cons "batchid" batchid) (cons "email" email) (cons "journal" journal)(cons "title" title)(cons "firstn" firstn)))
 	 (dummy (if (string= email "null") #f
 		    (begin
-		      (send-custom-email the-list);;comment this out to send report only   <==================uncomment for use
+;;		      (send-custom-email the-list);;comment this out to send report only   <==================uncomment for use
 		      (mark-email-sent batchid email)
 		      (set! total-emails-sent (+ total-emails-sent 1))
 		      (set! emails-sent (cons for-report emails-sent))))))
@@ -121,9 +123,12 @@
   ;;  ("title" . "Repurposing Drugs for Mayaro Virus: Identification.... Inhibitors.")
   ;;  ("firstn" . "Rana"))
   (let* (
+	 (varlst (get-envs))
+	 (sender (assoc-ref varlst "sender"))
+	 (bcc-recipient (assoc-ref varlst "bcc-recipient"))
 	 (email (assoc-ref item "email"))  ;;<==========================comment this out for testing
-	 (batchid (assoc-ref item "batchid"))
 ;;	 (email "mbcladwell@labsolns.com")
+	 (batchid (assoc-ref item "batchid"))
 ;;	 (_ (pretty-print (string-append "the email: " email)))
 	 (first-name (if (fname-from-email email) (fname-from-email email)(assoc-ref item "firstn")))
 	 (txt-composite (format #f "Content-Transfer-Encoding: binary\nContent-Type: multipart/alternative; boundary=\"_----------=_1737893771238871\"\nMIME-Version: 1.0\nDate: ~a\nFrom: ~a\nTo: ~a\nBcc: ~a\nSubject: Multi-well plate management software\n\n--_----------=_1737893771238871\nContent-Disposition: inline\nContent-Transfer-Encoding: quoted-printable\nContent-Type: text/plain\n\nDear ~a,\n\nYour recent article entitled ~a in the journal ~a  suggests you might benefit from our product. Visit Laboratory Automation Solutions at www.labsolns.com and learn how LIMS*Nucleus can help you.\n\nLIMS*Nucleus can:\n\n-Reformat plates - four 96 well plates into a 384 well plate; four 384 well plates into a 1536 well plate\n-Associate assay data with plate sets\n-Identify hits scoring in assays using included algorithms - or write your own\n-Export annotated data\n-Generate worklists for liquid handling robots\n-Rearray hits into a smaller collection of plates\n-Track samples\n\nLIMS*Nucleus can serve as the core of a LIMS system.\nPrototype algorithms, dashboards, visualizations with R/Shiny.\nDownload a free copy or evaluate an online running instance by visiting www.labsolns.com/limsn/evaluate/\n\nFor more information contact mbcladwell@labsolns.com\n\nThank You!\n\nMortimer Cladwell MSc\nPrincipal\n\nTo unsubscribe, paste the following URL into a browser:\n\nhttps://www.labsolns.com/limsn/unsubscribe/insert.php?email=~a\n\n--_----------=_1737893771238871\nContent-Transfer-Encoding: binary\nContent-Type: multipart/related; boundary=\"_----------=_1737893771238870\"\n\nThis is a multi-part message in MIME format.\n\n" (date->string (current-date)) sender email bcc-recipient first-name (assoc-ref item "title")(assoc-ref item "journal") email))	
@@ -142,7 +147,7 @@
     ;;(mark-email-sent batchid email) ;;moved to send-email
     ))
 
-(define (send-report lst)
+(define (send-report lst sender)
   ;; lst is the stats
   ;; alist is emails that were sent, migt be null
   ;; blist is emails rejected because they were unsubscribed

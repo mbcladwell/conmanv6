@@ -1,6 +1,7 @@
 (define-module (conmanv6 env)
   #:use-module (ice-9 regex) ;;list-matches
   #:use-module  (srfi srfi-19)   ;; date time
+#:use-module (ice-9 pretty-print)
   #:use-module (json)
   #:export (two-weeks-ago
 	    all-chars
@@ -9,45 +10,52 @@
 	    three-years-ago
 	    max-arts
 	    laspng
-	    sender
-	    bcc-recipient
 	    personal-email
 	    home-dir
-	    unsubscribe-file
-	    bcc-email
-	    send-report-flag
 	    get-envs
+	    testing
 	    ))
 
-;;(define conman-store-dir "conmanstorepath") ;;this will be modified upon install
+;;
+
+
 (define conman-store-dir "conmanstorepath") ;;this will be modified upon install
 
-(define sender "mbc2025@labsolns.com")
-(define bcc-recipient "mbc2025@labsolns.com")
 (define personal-email "mbcladwell@labsolns.com")
-(define home-dir "/home/admin/conman")
-;;(define unsubscribe-file (string-append home-dir "/unsubscribe.json"))	 
-
-(define bcc-email #t)
-(define send-report-flag #t)
+(define testing #f)
+(define home-dir (if testing "/home/mbc/conman" "/home/admin/conman"))
 (define envs-file (string-append home-dir "/envs.txt"))
+(pretty-print home-dir)
+;;((\"bcc-recipient\" . \"mbc2025@labsolns.com\")          <==== change to ""
+;; (\"sender\" . \"mbc2025@labsolns.com\")
+;; (\"send-report-flag\" . #t)
+;; )
+
+;; (define (get-envs)
+;;   ;;returns a list
+;;   (if (access? envs-file R_OK)
+;;       (let* ((varlst (call-with-input-file envs-file read))
+;; 	     )
+;; 	(begin
+;; 	  (set! bcc-email (assoc-ref varlst "bcc-email"))
+;; 	  (if bcc-email #f (set! bcc-recipient ""))
+;; 	  (set! send-report-flag (assoc-ref varlst "send-report-flag")))
+;; 	)
+;;       #f))
 
 (define (get-envs)
   ;;returns a list
   (if (access? envs-file R_OK)
-      (let* ((varlst (call-with-input-file envs-file read))
-	     )
-	(begin
-	  (set! bcc-email (assoc-ref varlst "bcc-email"))
-	  (if bcc-email #t (set! bcc-recipient ""))
-	  (set! send-report-flag (assoc-ref varlst "send-report-flag")))
-	)
+      (let ((varlst (call-with-input-file envs-file read)))
+	varlst)
       #f))
 
-
-(define days-ago 14) ;; how many days ago to I want to analyze? usually 14      may 31 2025 value 14 gave ~8 authors
+;;(define days-ago (if testing 15 14)) ;; how many days ago to I want to analyze? usually 14      may 31 2025 value 14 gave ~8 authors
+;;  July 6            14       9
+(define days-ago 14)
 ;; 14*60*60*24 = 1209600
 ;; 15*60*60*24 =  1296000
+(if testing (pretty-print (string-append "days ago: " (number->string days-ago))))
 (define duration (time-difference (make-time time-utc  0 (* 86400 days-ago)) (make-time time-utc  0 0)))
 (define two-weeks-ago (date->string  (time-utc->date (subtract-duration (current-time) duration)) "~Y/~m/~d"))
 

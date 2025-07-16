@@ -30,7 +30,9 @@
 
 
 (define db-vendor "mysql")
-(define connect-string "plapan_conman_ad:welcome:plapan_conman:tcp:192.254.187.215:3306")
+(define connect-string
+  (if testing "plapan_condev_ad:welcome12345ABCDE:plapan_condev:tcp:192.254.187.215:3306"
+      "plapan_conman_ad:welcome:plapan_conman:tcp:192.254.187.215:3306"))
 
 (define (make-ref-sql pmid journal title sql)
   ;;must pass in sql: INSERT INTO ref (pmid, journal, title) VALUES
@@ -128,13 +130,14 @@
 				(cdr (assoc "total-emails-sent" lst))
 				(cdr (assoc "elapsed-time" lst))
 				))
-	;; (_ (pretty-print sql-statement))
+	 (_ (if testing (pretty-print (format #f "in sqlstuff.scm:update-conmanstats: ~a" sql-statement))))
 	 )
     (send-sql sql-statement)))
 
 
 (define (send-sql sql-statement)
-(let* ((db-obj (dbi-open db-vendor connect-string))
+  (let* ((db-obj (dbi-open db-vendor connect-string))
+	 (_ (if testing (pretty-print (format #f "in sqlstuff.scm:send-sql: ~a" db-obj))))
 	 )
     (begin
       (dbi-query db-obj sql-statement)

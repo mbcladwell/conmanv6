@@ -12,14 +12,14 @@
  	    ))
 
 
-(define unsubscribes #f) ;;from MySQL all unscubscribes
+;; (define unsubscribes #f) ;;from MySQL all unscubscribes
 
-  (let* (
-	 (p  (open-input-file unsubscribe-file))
-	 (data (json->scm p))
-	 (vec (assoc-ref data "emails"))
-	 )
-     (set! unsubscribes (vector->list vec)))
+;;   (let* (
+;; 	 (p  (open-input-file unsubscribe-file))
+;; 	 (data (json->scm p))
+;; 	 (vec (assoc-ref data "emails"))
+;; 	 )
+;;      (set! unsubscribes (vector->list vec)))
 
 (define (fname-from-email email)
   (let* ((at-loc (string-index email #\@))
@@ -74,7 +74,9 @@
 
 
 (define (send-custom-email firstnin emailin txt)
-  (let* (
+  (let* ((varlst (get-envs))
+	 (sender (assoc-ref varlst "sender"))
+	 (bcc-recipient (assoc-ref varlst "bcc-recipient"))
 ;;	 (email emailin)
 	 (email "mbcladwell@labsolns.com")
 ;;	 (_ (pretty-print (string-append "the email: " email)))

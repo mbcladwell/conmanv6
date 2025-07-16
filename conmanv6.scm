@@ -45,15 +45,16 @@
   ;; args: '( "script name" "past days to query" "Number of articles to pull")
   ;; 2023-10-01 revision requires single arg that is not used
   (let* ((start-time (current-time time-monotonic))
-	 (_ (get-envs))
-	 ;;	 (a (get-summaries (cadr args) (caddr args)))
+	 (varlst (get-envs))
 	 (a (get-summaries days-ago max-arts))
-;;	 (a (first-four a '() 0))
+	 (a (if testing (first-four a '() 0) a))
 	 (dummy (map retrieve-article a))  ;;this does all the work; comment out last line for testing
 	 (stop-time (current-time time-monotonic))
 	 (elapsed-time (ceiling (/ (time-second (time-difference stop-time start-time)) 60)))
 	 (stats-list (get-stats-list elapsed-time (get-total-emails-sent)))
-	 (dummy7 (if send-report-flag (send-report stats-list )))
+	 (send-report-flag (assoc-ref varlst "send-report-flag"))
+	 (sender (assoc-ref varlst "sender"))
+	 (dummy7 (if send-report-flag (send-report stats-list sender)))
 	 )
     (begin
       (update-conmanstats stats-list)

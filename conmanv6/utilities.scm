@@ -18,8 +18,10 @@
 	    get-rand-file-name
 	    ))
 
+
 (define (get-rand-file-name pre suff)
   (begin
+    (pretty-print (string-append "home-dir in get-r-f-name: " home-dir))
   (string-append home-dir "/tmp/" pre "-" (substring (string-append (number->string  (time-second (current-time)))(number->string  (time-nanosecond (current-time)))) 0 12) "." suff))
 )
 
