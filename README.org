@@ -1,7 +1,7 @@
 -*- mode: org; coding: utf-8; -*-
 
 #+TITLE: README for Conmanv6
-This project will resort pack to using MySQL to hold data
+This project will resort back to using MySQL to hold data
 direct copy of conmanv5 with supplementation from conmanv2
 3/2025
 
